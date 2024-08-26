@@ -438,7 +438,40 @@ $ cat pickle_trace | grep plus | grep exec
 <built-in function exec> ('plus[7][2] = 5 + 1',)
 ```
 
-If you match the indices of plus to that of the expected solution, you will see that the indexed squares are substituted with values in this plus matrix. 
+If you match the indices of plus to that of the expected solution, you will see that the indexed squares are substituted with values in this plus matrix. Next question is, how are the indices and values chosen? If we look at how the first set of indices are created: 
+
+```
+<built-in function getattr> (<CDLL '/lib/x86_64-linux-gnu/libc.so.6', handle 728701593080 at 0x72870070d010>, 'srand')
+...
+<built-in function time> ()
+<class 'int'> (1724528623.368277,)
+<_FuncPtr object at 0x728700818a10> (1724528623,)
+...
+<built-in method join of str object at 0xa6f200> (['r', 'a', 'n', 'd'],)
+<built-in function getattr> (<CDLL '/lib/x86_64-linux-gnu/libc.so.6', handle 728701593080 at 0x72870070d010>, 'rand')
+...
+<_FuncPtr object at 0x72870081b520> ()
+<built-in function mod> (2085967131, 9)
+<class 'str'> (6,)
+<built-in function add> ('plus[6', '][')
+...
+<_FuncPtr object at 0x72870081b520> ()
+<built-in function mod> (987274433, 9)
+<class 'str'> (2,)
+<built-in function add> ('plus[6][', '2')
+...
+<built-in function add> ('plus[6][2', '] = ')
+...
+<_FuncPtr object at 0x72870081b520> ()
+<built-in function mod> (982788104, 9)
+<class 'str'> (2,)
+<built-in function add> ('plus[6][2] = ', '2')
+
+```
+
+From the print outs, it looks like the indices and the values are generated with `rand()`, which is seeded with the current time. After I updated my script to take this substitution matrix into account, I got the initial correct answer. 
+
+The script gave me another challenge after the first correct answer, and the response is the same: a sudoku solution modified by a substitution matrix. I got to the final flag locally, but of course, when ran against the challenge server, I have to run it 5-10 times because the seed to `rand()` is time-based. 
 
 # Flag
 ```
@@ -477,8 +510,4 @@ Even though most reverse engineering writeups are straightforward, the act of re
 
 2. This is the first time i've seen a pickle bytestring with the `buffers` argument. Since I was building the small pickle interpreter, I spent a few hours trying to figure out how `buffers` work, going into the PEP documentation of pickle protocol 5.0. I stopped digging deep once I realize I can just hook the existing pickle code in my library. 
 
-1. I spent a lot of time figuring out `sudokum` was a small python library. I originally thought we need to reverse engineer w
-
-2. I spent some time implementing an actual pickle parser myself. After a few hours, I realize that this exercise is moot and I should just go for the 
-
-
+3. I spent half an hour to figure out `sudokum` was an existing python library. I originally thought we need to reverse engineer what sudokum is from the bytecode. But luckily I did some more research and found the link to the sudokum python package. 
