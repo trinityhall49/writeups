@@ -32,7 +32,7 @@ The python script consist of one very long pickle bytestring. I wrote the bytest
 
 Some more research revealed that there is a `REDUCE` opcode that would call pythonic functions (Side note: this is also one of the ways that pickles can be exploited to run arbitrary code). This is an interesting find! What if I can intercept this opcode to figure out all the function calls!
 
-So that's exactly what I did -- I looked at the local pickle.py file installed along with python.11 and looked for the function that executes the reduce opcode. It looks like this:
+So that's exactly what I did -- I looked at the local pickle.py file installed along with python3.11 and looked for the function that executes the reduce opcode. It looks like this:
 
 ```
 $ sudo vim /usr/lib/python3.11/pickle.py 
@@ -357,7 +357,7 @@ What about the second 2D array. If you look around when the challenge is printed
 [PICKLE HOOK] <built-in method decode of bytes object at 0x7da8dc9f3be0> ()
 [PICKLE HOOK] <built-in function print> ('FnQ8apO3E4PaRTzBjw6jWxvBC9Bq+hn0DDl+GVdkxHYU',)
 ```
-A variable called `dirg` is used to create a large number, which gets converted to a byte string, and then base64-encoded. This is exactly the opposite of the previous process! And looking at the code object that is referncing `dirg`, there are other calls like `sudokum`, `solve`, `append`, maybe this is a sudoku puzzle, and the response is just to solve the sudoku! So I went to work again, and wrote a script that solves the sudoku and encodes the solution in the way the challenge wants:
+A variable called `dirg` is used to create a large number, which gets converted to a byte string, and then base64-encoded. This is exactly the opposite of the previous process! And looking at the code object that is referencing `dirg`, there are other calls like `sudokum`, `solve`, `append`, maybe this is a sudoku puzzle, and the response is just to solve the sudoku! So I went to work again. I wrote a script that solves the sudoku and encodes the solution in the way the challenge wants:
 
 ```
 $ python3.11 magnum-opus.py
